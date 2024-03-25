@@ -3,7 +3,7 @@ from functools import partial
 import logging
 import voluptuous as vol
 
-from .miio import DreameVacuum, DeviceException
+from miio import DreameVacuum, DeviceException
 
 from homeassistant.components.vacuum import (
     PLATFORM_SCHEMA,
@@ -17,7 +17,7 @@ from homeassistant.components.vacuum import (
     VacuumEntityFeature,
 )
 
-from homeassistant.const import CONF_HOST, CONF_NAME, CONF_TOKEN
+from homeassistant.const import CONF_HOST, CONF_NAME, CONF_TOKEN, CONF_UNIQUE_ID
 from homeassistant.helpers import config_validation as cv, entity_platform
 
 _LOGGER = logging.getLogger(__name__)
@@ -30,6 +30,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
         vol.Required(CONF_HOST): cv.string,
         vol.Required(CONF_TOKEN): vol.All(str, vol.Length(min=32, max=32)),
         vol.Optional(CONF_NAME, default=DEFAULT_NAME): cv.string,
+        vol.Optional(CONF_UNIQUE_ID): cv.string,
     },
     extra=vol.ALLOW_EXTRA,
 )
@@ -125,12 +126,13 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
     host = config.get(CONF_HOST)
     token = config.get(CONF_TOKEN)
     name = config.get(CONF_NAME)
+    unique_id = config.get(CONF_UNIQUE_ID)
 
     # Create handler
     _LOGGER.info("Initializing with host %s (token %s...)", host, token)
     vacuum = DreameVacuum(host, token)
 
-    dreame_vacuum_entity = DreameVacuumEntity(name, vacuum)
+    dreame_vacuum_entity = DreameVacuumEntity(name, vacuum, unique_id)
     hass.data[DATA_KEY][host] = dreame_vacuum_entity
 
     async_add_entities([dreame_vacuum_entity], update_before_add=True)
@@ -139,10 +141,11 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
 class DreameVacuumEntity(StateVacuumEntity):
     """Representation of a Xiaomi vacuum cleaner robot."""
 
-    def __init__(self, name, vacuum):
+    def __init__(self, name, vacuum, unique_id=None):
         """Initialize the Xiaomi vacuum cleaner robot handler."""
         self._name = name
         self._vacuum = vacuum
+        self._unique_id = unique_id
 
         self._fan_speeds = None
         self._fan_speeds_reverse = None
@@ -268,6 +271,11 @@ class DreameVacuumEntity(StateVacuumEntity):
     def supported_features(self):
         """Flag vacuum cleaner robot features that are supported."""
         return SUPPORT_XIAOMI
+
+    @property
+    def unique_id(self):
+        """Return the unique id of the device."""
+        return self._unique_id
 
     async def _try_command(self, mask_error, func, *args, **kwargs):
         """Call a vacuum command handling error messages."""

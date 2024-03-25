@@ -16,6 +16,7 @@ vacuum:
     host: <ip>
     token: "<token>"
     name: <name>
+    unique_id: vacuum.<name>
 ```
 
 To retrieve the token, follow the default integration <a href="https://www.home-assistant.io/integrations/vacuum.xiaomi_miio/#retrieving-the-access-token">instructions</a>.

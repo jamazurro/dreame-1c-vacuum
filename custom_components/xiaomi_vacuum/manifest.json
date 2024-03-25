@@ -2,7 +2,9 @@
   "domain": "xiaomi_vacuum",
   "name": "Xiaomi Vacuum 1C",
   "documentation": "",
-  "requirements": [],
+  "requirements": [
+    "python-miio==0.5.12"
+  ],
   "codeowners": ["@augustas2"],
   "version": "1.0"
 }
