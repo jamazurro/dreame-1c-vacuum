@@ -3,7 +3,7 @@ from functools import partial
 import logging
 import voluptuous as vol
 
-from miio import DreameVacuum, DeviceException
+from .miio import DreameVacuum, DeviceException
 
 from homeassistant.components.vacuum import (
     PLATFORM_SCHEMA,
@@ -18,7 +18,7 @@ from homeassistant.components.vacuum import (
 )
 
 from homeassistant.const import CONF_HOST, CONF_NAME, CONF_TOKEN, CONF_UNIQUE_ID
-from homeassistant.helpers import config_validation as cv, entity_platform
+from homeassistant.helpers import config_validation as cv
 
 _LOGGER = logging.getLogger(__name__)
 
